@@ -4,11 +4,13 @@
 
 import pexpect
 import time
+import os
 import statistics
+import requests
 
 
 def get_minute_measure(child):
-    end_time = time.time()+60
+    end_time = time.time()+10
     measures = []
     while time.time() < end_time:
         child.sendline("char-write-cmd 0x25 5e")
@@ -33,6 +35,7 @@ def get_minute_measure(child):
         raw_value = value.split(b'dBA')[0]
 
         dba_noise = float(raw_value.decode('ascii'))
+        print(dba_noise)
         measures.append(dba_noise)
     return {
         'min': min(measures),
@@ -44,7 +47,20 @@ def get_minute_measure(child):
 
 def send_stats(stats):
     print(stats)
-    pass
+    now = int(time.time())
+    for key, value in stats.items():
+        pt = {
+            "metric": "noise.outside",
+            "timestamp": now,
+            "value": value,
+            "tags": {
+               "type": key,
+            }
+        }
+        OPEN_TSDB_HOST = os.environ.get('OPEN_TSDB_HOST')
+        url = f'http://{OPEN_TSDB_HOST}/api/put'
+        print(url)
+        r = requests.post(url, json=pt)
 
 
 
@@ -64,9 +80,9 @@ try:
     while True:
         try:
             stats = get_minute_measure(child)
-            send_stats(stats)
-        except:
+        except Exception as e:
             time.sleep(10)
+        send_stats(stats)
 finally:
     child.sendline('disconnect')
 
