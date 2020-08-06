@@ -81,8 +81,13 @@ try:
         try:
             stats = get_minute_measure(child)
         except Exception as e:
-            time.sleep(10)
-        send_stats(stats)
+            print("Sleep - Error 1")
+            time.sleep(5)
+        try:
+            send_stats(stats)
+        except Exception as e:
+            print("Sleep - Error 2")
+            time.sleep(5)
 finally:
     child.sendline('disconnect')
 
