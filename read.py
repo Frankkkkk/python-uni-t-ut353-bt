@@ -62,11 +62,10 @@ def send_stats(stats):
             }
         }
         OPEN_TSDB_HOST = os.environ.get('OPEN_TSDB_HOST')
-        url = f'http://{OPEN_TSDB_HOST}/api/put'
-        print(url)
-        r = requests.post(url, json=pt)
-
-
+        if OPEN_TSDB_HOST:
+            url = f'http://{OPEN_TSDB_HOST}/api/put'
+            print(url)
+            r = requests.post(url, json=pt)
 
 if len(sys.argv) == 2:
   DEVICE_MAC = sys.argv[1]
