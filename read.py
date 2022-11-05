@@ -15,7 +15,8 @@ def get_minute_measure(child):
     measures = []
     while time.time() < end_time:
         child.sendline("char-write-cmd 0x25 5e")
-        time.sleep(.1)
+        # we get 40 samples in 10s with 200ms sleep, which is ideal for sat sampling at 250ms
+        time.sleep(.2) 
 
         child.expect("Notification handle.*", timeout=10)
         result = child.after.split(b'\r')[0]
@@ -36,9 +37,11 @@ def get_minute_measure(child):
         raw_value = value.split(b'dBA')[0]
 
         dba_noise = float(raw_value.decode('ascii'))
-        print(dba_noise)
+        # print(dba_noise)
         measures.append(dba_noise)
+
     return {
+#        'length': len(measures),
         'min': min(measures),
         'max': max(measures),
         'median': statistics.median(measures),
