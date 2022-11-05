@@ -7,6 +7,7 @@ import time
 import os
 import statistics
 import requests
+import sys
 
 
 def get_minute_measure(child):
@@ -64,13 +65,18 @@ def send_stats(stats):
 
 
 
-DEVICE = "90:E2:02:8F:76:7D"
+if len(sys.argv) == 2:
+  DEVICE_MAC = sys.argv[1]
+elif os.environ.get('DEVICE_MAC'):
+  DEVICE_MAC = os.environ.get('DEVICE_MAC')
+else:
+  DEVICE_MAC = "90:E2:02:8F:76:7D"
 
 print('Launching gatttool -I')
 child = pexpect.spawn("gatttool -I")
 
-print(f'Connecting to {DEVICE}')
-child.sendline(f'connect {DEVICE}')
+print(f'Connecting to {DEVICE_MAC}')
+child.sendline(f'connect {DEVICE_MAC}')
 child.expect("Connection successful", timeout=5)
 print('Connected, Hell yeah ! !')
 
