@@ -91,6 +91,7 @@ try:
         except Exception as e:
             print("Sleep - Error 1")
             time.sleep(5)
+            continue
         try:
             send_stats(stats)
         except Exception as e:
